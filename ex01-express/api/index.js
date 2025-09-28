@@ -24,15 +24,6 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Código para injetar no context o usuário que está logado e os models
-app.use(async (req, res, next) => {
-  req.context = {
-    models,
-    me: await models.User.findByPk(1),
-  };
-  next();
-});
-
 app.use("/", routes.root);
 app.use("/session", routes.session);
 app.use("/users", routes.user);

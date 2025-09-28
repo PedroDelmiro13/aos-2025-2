@@ -41,9 +41,13 @@ router.put("/:messageId", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
+    const { text, userId } = req.body; 
+    if (!userId) {
+      return res.status(400).json({ error: "userId é obrigatório" });
+    }
     const message = await Message.create({
-      text: req.body.text,
-      userId: req.context.me.id,
+      text,
+      userId, 
     });
     return res.status(201).json(message);
   } catch (e) {
