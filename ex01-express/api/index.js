@@ -34,15 +34,12 @@ const port = process.env.PORT ?? 3000;
 
 const eraseDatabaseOnSync = process.env.ERASE_DATABASE === "true";
 
-sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
-  if (eraseDatabaseOnSync) {
-    createUsersWithMessages();
-  }
+await sequelize.sync({ force: eraseDatabaseOnSync });
+if (eraseDatabaseOnSync) {
+  await createUsersWithMessages();
+}
 
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}!`);
-  });
-});
+export default app;
 
 const createUsersWithMessages = async () => {
   await models.User.create(
@@ -81,4 +78,4 @@ const createUsersWithMessages = async () => {
     }
   );
 };
-export default app;
+
