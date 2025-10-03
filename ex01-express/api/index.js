@@ -32,12 +32,17 @@ app.use("/tarefas", routes.tarefa);
 
 const port = process.env.PORT ?? 3000;
 
-const eraseDatabaseOnSync = process.env.ERASE_DATABASE === "true";
-
-await sequelize.sync({ force: eraseDatabaseOnSync });
-if (eraseDatabaseOnSync) {
-  await createUsersWithMessages();
-}
+sequelize
+  .sync({ force: eraseDatabaseOnSync })
+  .then(async () => {
+    if (eraseDatabaseOnSync) {
+      await createUsersWithMessages();
+    }
+    console.log("✅ Banco sincronizado");
+  })
+  .catch((err) => {
+    console.error("Erro ao sincronizar banco:", err);
+  });
 
 export default app;
 
