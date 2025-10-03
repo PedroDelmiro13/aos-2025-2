@@ -32,19 +32,17 @@ app.use("/tarefas", routes.tarefa);
 
 const port = process.env.PORT ?? 3000;
 
-sequelize
-  .sync({ force: eraseDatabaseOnSync })
-  .then(async () => {
-    if (eraseDatabaseOnSync) {
-      await createUsersWithMessages();
-    }
-    console.log("✅ Banco sincronizado");
-  })
-  .catch((err) => {
-    console.error("Erro ao sincronizar banco:", err);
-  });
+const eraseDatabaseOnSync = process.env.ERASE_DATABASE === "true";
 
-export default app;
+sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
+  if (eraseDatabaseOnSync) {
+    createUsersWithMessages();
+  }
+
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}!`);
+  });
+});
 
 const createUsersWithMessages = async () => {
   await models.User.create(
@@ -83,4 +81,4 @@ const createUsersWithMessages = async () => {
     }
   );
 };
-
+export default app;
