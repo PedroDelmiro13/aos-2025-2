@@ -25,17 +25,55 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
-    console.log("Body recebido:", req.body);
-    const user = await User.create({
-      username: req.body.username,
-      email: req.body.email
-    });
-    return res.status(201).json(user);
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email obrigatório" });
+    }
+
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(401).json({ error: "Usuário não encontrado" });
+    }
+
+    
+    const token = jwt.sign(
+      { id: user.id_usuario, email: user.email, username: user.username },
+      process.env.MY_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ token });
   } catch (e) {
-    console.error("Erro ao criar usuário:", e.name, e.errors ? e.errors.map(err => err.message) : e.message);
-    return res.status(500).json({ error: "Erro ao criar usuário" });
+    res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/cadastro", async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+      throw new Error("Username e email são obrigatórios");
+    }
+
+    const newUser = await User.create({ username, email });
+
+    const token = jwt.sign(
+      { id: newUser.id_usuario, email: newUser.email, username: newUser.username },
+      process.env.MY_SECRET,
+      { expiresIn: parseInt(process.env.JWT_EXPIRES_IN) }
+    );
+
+    res.status(201).json({
+      message: "Usuário criado",
+      data: { newUser, token },
+    });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
   }
 });
 
