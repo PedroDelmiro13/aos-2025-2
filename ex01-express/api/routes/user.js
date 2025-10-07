@@ -66,7 +66,7 @@ router.post("/cadastro", async (req, res) => {
     const token = jwt.sign(
       { id: newUser.id_usuario, email: newUser.email, username: newUser.username },
       process.env.MY_SECRET,
-      { expiresIn: parseInt(process.env.JWT_EXPIRES_IN) }
+      { expiresIn: "1h" }
     );
 
     res.status(201).json({
