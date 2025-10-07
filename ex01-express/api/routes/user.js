@@ -1,5 +1,6 @@
 import { Router } from "express";
 import models from "../models";
+import jwt from "jsonwebtoken";
 const { User } = models;
 
 const router = Router();
